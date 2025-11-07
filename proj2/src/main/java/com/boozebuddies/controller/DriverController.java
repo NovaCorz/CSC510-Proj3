@@ -10,6 +10,7 @@ import com.boozebuddies.model.CertificationStatus;
 import com.boozebuddies.security.annotation.RoleAnnotations.*;
 import com.boozebuddies.service.DriverService;
 import com.boozebuddies.service.PermissionService;
+import com.boozebuddies.service.UserService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class DriverController {
   private final DriverService driverService;
   private final DriverMapper driverMapper;
   private final PermissionService permissionService;
+  private final UserService userService;
 
   // ==================== ADMIN ENDPOINTS ====================
 
@@ -152,16 +154,54 @@ public class DriverController {
   /**
    * Retrieves the authenticated driver's profile.
    *
+   * @param id the user ID (must match authenticated user or user must be ADMIN)
    * @param authentication the authentication object
    * @return the driver's profile
    */
   @GetMapping("/my-profile")
-  @IsSelfOrAdmin
-  public ResponseEntity<ApiResponse<DriverDTO>> getMyProfile(Authentication authentication) {
-    User user = permissionService.getAuthenticatedUser(authentication);
-    Driver driver = driverService.getDriverProfile(user);
-    DriverDTO driverDTO = driverMapper.toDTO(driver);
-    return ResponseEntity.ok(ApiResponse.success(driverDTO, "Your profile retrieved successfully"));
+  @IsAuthenticated
+  public ResponseEntity<ApiResponse<DriverDTO>> getMyProfile(
+      @RequestParam("id") Long id, Authentication authentication) {
+    try {
+      User authenticatedUser = permissionService.getAuthenticatedUser(authentication);
+
+      if (authenticatedUser == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.error("Authentication required"));
+      }
+
+      // Check if user is accessing their own profile or is admin
+      boolean isSelf = permissionService.isSelf(authentication, id);
+      boolean isAdmin = authenticatedUser.hasRole(com.boozebuddies.model.Role.ADMIN);
+
+      if (!isSelf && !isAdmin) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(ApiResponse.error("You don't have permission to access this profile"));
+      }
+
+      // Refresh user from database to ensure roles are loaded
+      User freshUser = userService.findById(id);
+      // Verify user has DRIVER role
+      if (!freshUser.hasRole(com.boozebuddies.model.Role.DRIVER)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(ApiResponse.error("User does not have DRIVER role"));
+      }
+
+      Driver driver = driverService.getDriverProfile(freshUser);
+      if (driver == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ApiResponse.error("Driver profile not found for this user"));
+      }
+      DriverDTO driverDTO = driverMapper.toDTO(driver);
+      return ResponseEntity.ok(
+          ApiResponse.success(driverDTO, "Driver profile retrieved successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(ApiResponse.error("Driver profile not found: " + e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body(ApiResponse.error("Failed to retrieve driver profile: " + e.getMessage()));
+    }
   }
 
   /**

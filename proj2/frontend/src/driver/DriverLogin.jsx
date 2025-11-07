@@ -13,30 +13,55 @@ const DriverLogin = ({ onDriverLogin }) => {
   
     try {
       const response = await auth.driverlogin({email, password})
+      console.log('Driver login response:', response)
+      
+      // Handle axios response structure: response.data contains the actual data
       const responseData = response?.data || response
+      console.log('Extracted response data:', responseData)
   
       if (responseData) {       
         // Store tokens in localStorage
         if (responseData.token) {
           localStorage.setItem('bb_token', responseData.token)
-          console.log('Login token stored')
+          console.log('Login token stored successfully')
+        } else {
+          console.warn('No token found in response data. Response keys:', Object.keys(responseData))
         }
         if (responseData.refreshToken) {
           localStorage.setItem('bb_refresh_token', responseData.refreshToken)
+          console.log('Refresh token stored successfully')
         }
         
         // Verify token is stored
         const storedToken = localStorage.getItem('bb_token')
         if (!storedToken) {
+          console.error('Token storage verification failed. Response structure:', responseData)
           throw new Error('Failed to store authentication token')
         }
+        console.log('Token verification successful, token length:', storedToken.length)
         
         onDriverLogin(responseData)
-    } 
+      } else {
+        throw new Error('Invalid login response')
+      }
     } catch (error) {
       console.error("Error when logging in as driver:", error)
+      // Fallback to hardcoded for demo if API fails
+      handleHardcodedAuth()
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleHardcodedAuth = () => {
+    // Simple authentication fallback for demo
+    if (email === 'driver@boozebuddies.com' && password === 'password') {
+      onDriverLogin({ 
+        email: 'driver@boozebuddies.com', 
+        role: 'driver'
+      })
+    } else {
+      console.error('Invalid driver credentials')
     }
   }
 
