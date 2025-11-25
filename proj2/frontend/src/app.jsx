@@ -9,6 +9,7 @@ import UserSettings from './components/UserSettings'
 import AdminHome from './admin/AdminHome'
 import MerchantHome from './admin/MerchantHome'
 import DriverHome from './driver/DriverHome'
+import OrderConfirmed from './components/OrderConfirmed'
 import './App.css'
 import DriverOrderState from './driver/DriverOrderState'
 
@@ -115,7 +116,9 @@ function App() {
       case 'driver-login':
         return <DriverLogin onDriverLogin={handleDriverLogin} />
       case 'home':
-        return <Home onSelectRestaurant={handleSelectRestaurant} onOpenSettings={() => setCurrentPage('settings')} onLogout={handleLogout} />
+        return <Home onSelectRestaurant={handleSelectRestaurant} onOpenSettings={() => setCurrentPage('settings')} onOpenOrders={() => setCurrentPage('orders')} onLogout={handleLogout} />
+      case 'orders':
+        return <OrderConfirmed onBack={() => setCurrentPage('home')} onViewCart={() => setCurrentPage('cart')} cart ={cart} />
       case 'menu':
         return (
           <RestaurantMenu
