@@ -6,6 +6,8 @@ export const users = {
   getById: (id) => http.get(`/users/${id}`),
   getMe: () => http.get('/users/me'),
   verifyAge: (userId) => http.post(`/users/${userId}/verify-age`),
+  update: (id, user) => http.put(`/users/${id}`, user),
+  delete: (id) => http.delete(`/users/${id}`),
 }
 
 export default users

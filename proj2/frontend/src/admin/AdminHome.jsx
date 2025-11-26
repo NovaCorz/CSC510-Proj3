@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Trash2, LogOut, Store, RefreshCw } from 'lucide-react'
-import { merchants } from '../services/api' // Import from your api barrel
+import { merchants, users } from '../services/api'
 
 const AdminHome = ({ onLogout }) => {
   const [merchantsList, setMerchantsList] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  
+  const [usersList, setUsersList] = useState([])
   
   const [newMerchant, setNewMerchant] = useState({
     name: '',
@@ -20,7 +22,32 @@ const AdminHome = ({ onLogout }) => {
   // Load merchants on component mount
   useEffect(() => {
     loadMerchants()
+    loadUsers()   // ⭐ added
   }, [])
+
+  
+  const loadUsers = async () => {
+    try {
+      const response = await users.getAll()
+      setUsersList(response.data.data || response.data || [])
+    } catch (err) {
+      console.error("Failed to load users:", err)
+    }
+  }
+
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return
+
+    try {
+      await users.delete(id)
+      setUsersList(prev => prev.filter(u => u.id !== id))
+      alert("User deleted successfully!")
+    } catch (err) {
+      console.error("Failed to delete user:", err)
+      alert("Error deleting user.")
+    }
+  }
+
 
   const loadMerchants = async () => {
     try {
@@ -355,6 +382,38 @@ const AdminHome = ({ onLogout }) => {
             <div className="text-gray-400">Active</div>
           </div>
         </div>
+		
+		{/* ⭐ USERS SECTION — ADDED AT BOTTOM */}
+		<div className="mt-12 bg-gray-900 border border-gray-700 rounded-lg p-6">
+		  <h2 className="text-2xl font-bold mb-6">Users</h2>
+
+		  {usersList.length === 0 ? (
+		    <p className="text-gray-400">No users found.</p>
+		  ) : (
+		    <div className="space-y-3">
+		      {usersList.map(user => (
+		        <div 
+		          key={user.id} 
+		          className="flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700"
+		        >
+		          <div>
+		            <p className="text-white font-medium">{user.name || "Unnamed User"}</p>
+		            <p className="text-gray-400 text-sm">{user.email}</p>
+		            <p className="text-gray-500 text-xs">ID: {user.id}</p>
+		          </div>
+
+		          <button
+		            onClick={() => handleDeleteUser(user.id)}
+		            className="text-red-500 hover:text-red-400 p-2"
+		          >
+		            <Trash2 className="w-5 h-5" />
+		          </button>
+		        </div>
+		      ))}
+		    </div>
+		  )}
+		</div>
+
       </div>
     </div>
   )

@@ -2,9 +2,9 @@ name: CI (proj2 Spring Boot)
 
 on:
   push:
-    branches: [main, dev]
+    branches: "**"     # Run on every branch
   pull_request:
-    branches: [main, dev]
+    branches: "**"     # Run on every PR
   workflow_dispatch:
     inputs:
       run-tests:
@@ -37,7 +37,12 @@ jobs:
 
   tests:
     name: Optional Tests
-    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.run-tests == true) }}
+    # Run tests ALWAYS on push + PR, OR manually if dispatch says true
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run-tests == true)
+
     runs-on: ubuntu-latest
     defaults:
       run:
