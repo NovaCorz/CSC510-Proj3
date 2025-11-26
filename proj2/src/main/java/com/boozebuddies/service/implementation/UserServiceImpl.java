@@ -203,10 +203,12 @@ public class UserServiceImpl implements UserService {
               if (updatedUser.getAddress() != null) {
                 user.setAddress(updatedUser.getAddress());
               }
-              if (updatedUser.getLatitude() != null && user.getLongitude() != null) {
-                  user.setLatitude(updatedUser.getLatitude());
-                  user.setLongitude(updatedUser.getLongitude());
-                }
+              if (updatedUser.getLatitude() != null) {
+            	    user.setLatitude(updatedUser.getLatitude());
+              }
+              if (updatedUser.getLongitude() != null) {
+	        	    user.setLongitude(updatedUser.getLongitude());
+              }
               return userRepository.save(user);
             })
         .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));

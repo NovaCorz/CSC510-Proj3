@@ -23,10 +23,10 @@ public class RegisterUserRequest {
 
   /** The user's date of birth */
   private LocalDate dateOfBirth;
-  
+
   /** The user's latitude */
   private Double latitude;
-  
+
   /** The user's longitude */
   private Double longitude;
 }
