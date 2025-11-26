@@ -82,6 +82,8 @@ public class UserMapper {
         .ageVerified(false) // Default to not verified
         .isActive(true) // Default to active
         .isEmailVerified(false) // Default to not verified
+        .latitude(request.getLatitude())
+        .longitude(request.getLongitude())
         .roles(new HashSet<>()) // Empty roles set, will be assigned in service
         .build();
   }
