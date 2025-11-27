@@ -158,10 +158,9 @@ public class DriverController {
    * @param authentication the authentication object
    * @return the driver's profile
    */
-  @GetMapping("/my-profile")
+  @GetMapping("/my-profile/{id}")
   @IsAuthenticated
-  public ResponseEntity<ApiResponse<DriverDTO>> getMyProfile(
-      @RequestParam("id") Long id, Authentication authentication) {
+  public ResponseEntity<ApiResponse<DriverDTO>> getMyProfile(@PathVariable Long id, Authentication authentication) {
     try {
       User authenticatedUser = permissionService.getAuthenticatedUser(authentication);
 

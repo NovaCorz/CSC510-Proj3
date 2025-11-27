@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react"
 import { LogOut,  RefreshCw } from 'lucide-react'
-import {drivers, orders} from "../services/api"
+import {drivers, orders, deliveries} from "../services/api"
 
 const DriverHome = ({ user, onLogout }) => {
     const [loading, setLoading] = useState(false);
@@ -131,17 +131,34 @@ const DriverHome = ({ user, onLogout }) => {
     }
 
     function startPickup(orderId) {
-        setAssignedOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "picking_up", startedAt: Date.now() } : o)));
+        try{
+            orders.updateStatus(orderId, "picking_up");
+            setAssignedOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "picking_up", startedAt: Date.now() } : o)));
+        }catch{
+            // Do nothing
+        }
     }
 
     function markPickedUp(orderId) {
-        setAssignedOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "on_route", pickedUpAt: Date.now() } : o)));
+        try{
+            orders.updateStatus(orderId, "in_transit");
+            setAssignedOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "on_route", pickedUpAt: Date.now() } : o)));
+        }catch{
+            // Do nothing
+        }
+        
     }
 
     function completeDelivery(orderId) {
-        setAssignedOrders(prev => prev.filter(o => o.id !== orderId));
-        // in a real app you'd update server and trigger earnings, etc.
-        alert("Delivery completed. Good job!");
+        try{
+            orders.updateStatus(orderId, "delivered");
+            setAssignedOrders(prev => prev.filter(o => o.id !== orderId));
+            // in a real app you'd update server and trigger earnings, etc.
+            alert("Delivery completed. Good job!");
+        }catch{
+            //Do nothing
+        }
+        
     }
 
     const filteredAvailable = availableOrders.filter(o => {
