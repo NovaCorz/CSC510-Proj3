@@ -70,7 +70,7 @@ public class MerchantServiceImpl implements MerchantService {
       throw new IllegalArgumentException("Merchant phone is required");
     }
 
-    merchant.setActive(false);
+    merchant.setActive(true);
     return merchantRepository.save(merchant);
   }
 

@@ -53,7 +53,7 @@ class MerchantServiceImplTest {
     Merchant result = merchantService.registerMerchant(testMerchant);
 
     assertNotNull(result);
-    assertFalse(result.isActive());
+    assertTrue(result.isActive());
     verify(merchantRepository, times(1)).save(testMerchant);
   }
 
@@ -126,7 +126,7 @@ class MerchantServiceImplTest {
 
     Merchant result = merchantService.registerMerchant(testMerchant);
 
-    assertFalse(result.isActive());
+    assertTrue(result.isActive());
   }
 
   // ==================== verifyMerchant Tests ====================
