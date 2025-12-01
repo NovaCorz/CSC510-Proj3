@@ -23,7 +23,7 @@ The project demonstrates the power of distributed teamwork, automation, and clea
 ---
 ## Demo
 
-**enter demo here**
+enter demo here
 ---
 
 ## 🧩 Tech Stack
