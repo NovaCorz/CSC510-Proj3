@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Trash2, LogOut, Store, RefreshCw } from 'lucide-react'
 import { merchants, users } from '../services/api'
 
-const AdminHome = ({ onLogout }) => {
+const AdminHome = ({ onLogout, onAnalytics }) => {
   const [merchantsList, setMerchantsList] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
@@ -154,6 +154,15 @@ const AdminHome = ({ onLogout }) => {
             <p className="text-gray-400">Manage merchants and system settings</p>
           </div>
           <div className="flex space-x-4">
+            {/* Admin Analytics Button */}
+            {onAnalytics && (
+              <button
+                onClick={onAnalytics}
+                className="bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 flex items-center"
+              >
+                Admin Analytics
+              </button>
+            )}
             <button
               onClick={loadMerchants}
               className="bg-gray-700 text-white px-4 py-3 rounded-lg font-semibold hover:bg-gray-600 transition duration-200 flex items-center"
