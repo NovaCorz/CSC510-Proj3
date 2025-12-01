@@ -331,7 +331,7 @@ public class DriverControllerTest {
     when(driverMapper.toDTO(testDriver)).thenReturn(testDriverDTO);
 
     mockMvc
-        .perform(get("/api/drivers/my-profile").param("id", "10"))
+        .perform(get("/api/drivers/my-profile/10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.success").value(true))
         .andExpect(jsonPath("$.message").value("Driver profile retrieved successfully"))
