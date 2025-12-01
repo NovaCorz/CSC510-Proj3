@@ -248,9 +248,7 @@ public class MerchantController {
   @org.springframework.security.access.prepost.PreAuthorize(
       "hasRole('ADMIN') or @permissionService.ownsMerchant(authentication, #id)")
   public ResponseEntity<?> getOrdersByMerchant(
-      @PathVariable Long id,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
+      @PathVariable Long id
       Authentication authentication) {
     try {
       if (id == null || id <= 0) {
