@@ -1,6 +1,7 @@
 # 🍻 BoozeBuddies — CSC510-S2G1-F2025 - contributions by S1G13
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17781284.svg)](https://zenodo.org/records/17781284)
+[![License](https://img.shields.io/github/license/NovaCorz/CSC510-Proj3/proj2/docs)](https://github.com/NovaCorz/CSC510-Proj3/blob/docs/proj2/docs/LICENSE)
 [![GitHub Release](https://img.shields.io/github/release/NovaCorz/CSC510-Proj3.svg)](https://github.com/NovaCorz/CSC510-Proj3/releases)
 [![codecov](https://codecov.io/gh/NovaCorz/CSC510-Proj3/graph/badge.svg?token=SA6418M91G)](https://codecov.io/gh/NovaCorz/CSC510-Proj3)
 [![Build main](https://github.com/NovaCorz/CSC510-Proj3/actions/workflows/java-ci.yml/badge.svg)](https://github.com/NovaCorz/CSC510-Proj3/actions/workflows/java-ci.yml)
