@@ -1,5 +1,12 @@
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TheVietScholar/CSC510-S2G1-F2025/java-ci.yml?style=for-the-badge)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17458738.svg)](https://zenodo.org/doi/10.5281/zenodo.17458738)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17781284.svg)](https://zenodo.org/records/17781284)
+[![GitHub Release](https://img.shields.io/github/release/NovaCorz/CSC510-Proj3.svg)](https://github.com/NovaCorz/CSC510-Proj3/releases)
+[![codecov](https://codecov.io/gh/NovaCorz/CSC510-Proj3/branch/main/graph/badge.svg)](https://codecov.io/gh/NovaCorz/CSC510-Proj3)
+[![Build main](https://github.com/NovaCorz/CSC510-Proj3/actions/workflows/java-ci.yml/badge.svg)](https://github.com/NovaCorz/CSC510-Proj3/actions/workflows/java-ci.yml)
+[![Open Issues](https://img.shields.io/github/issues/NovaCorz/CSC510-Proj3)](https://github.com/NovaCorz/CSC510-Proj3/issues)
+[![Closed Issues](https://img.shields.io/github/issues-closed/NovaCorz/CSC510-Proj3?color=green)](https://github.com/NovaCorz/CSC510-Proj3/issues?q=is%3Aissue+is%3Aclosed)
+[![Pull Requests](https://img.shields.io/github/issues-pr/NovaCorz/CSC510-Proj3)](https://github.com/NovaCorz/CSC510-Proj3/pulls)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/NovaCorz/CSC510-Proj3/main) 
+![GitHub code size in bytes](https://img.shields.io/github/repo-size/NovaCorz/CSC510-Proj3)
 
 # 🍻 BoozeBuddies — CSC510-S2G1-F2025
 
