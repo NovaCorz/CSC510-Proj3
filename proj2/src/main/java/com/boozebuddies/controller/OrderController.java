@@ -342,11 +342,9 @@ public class OrderController {
    * @param authentication the authentication object
    * @return the updated order
    */
-  @PutMapping("/{orderId}/status")
-  @org.springframework.security.access.prepost.PreAuthorize(
-      "hasRole('ADMIN') or @permissionService.merchantCanAccessOrder(authentication, #orderId)")
+  @PutMapping("/{orderId}/{status}")
   public ResponseEntity<ApiResponse<OrderDTO>> updateOrderStatus(
-      @PathVariable Long orderId, @RequestParam String status, Authentication authentication) {
+      @PathVariable Long orderId, @PathVariable String status, Authentication authentication) {
     try {
       if (orderId == null || orderId <= 0) {
         return ResponseEntity.badRequest().body(ApiResponse.error("Invalid order ID"));

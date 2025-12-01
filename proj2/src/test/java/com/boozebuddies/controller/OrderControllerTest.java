@@ -882,7 +882,7 @@ public class OrderControllerTest {
         .thenThrow(new RuntimeException("Update failed"));
 
     mockMvc
-        .perform(put("/api/orders/1/status").param("status", "CONFIRMED"))
+        .perform(put("/api/orders/1/CONFIRMED"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(

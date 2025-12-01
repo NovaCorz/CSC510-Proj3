@@ -195,7 +195,7 @@ public class OrderServiceImpl implements OrderService {
 
     order.setStatus(newStatus);
     order.setUpdatedAt(LocalDateTime.now());
-
+    System.out.println("Updating order " + orderId + " to status " + newStatus);
     Order updatedOrder = orderRepository.save(order);
     handleStatusChange(updatedOrder, newStatus);
     return updatedOrder;

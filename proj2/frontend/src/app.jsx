@@ -9,6 +9,8 @@ import UserSettings from './components/UserSettings'
 import AdminHome from './admin/AdminHome'
 import MerchantHome from './admin/MerchantHome'
 import DriverHome from './driver/DriverHome'
+import OrderConfirmed from './components/OrderConfirmed'
+import AdminAnalyticsPage from './admin/AdminAnalyticsComponent'
 import './App.css'
 import DriverOrderState from './driver/DriverOrderState'
 
@@ -115,7 +117,9 @@ function App() {
       case 'driver-login':
         return <DriverLogin onDriverLogin={handleDriverLogin} />
       case 'home':
-        return <Home onSelectRestaurant={handleSelectRestaurant} onOpenSettings={() => setCurrentPage('settings')} onLogout={handleLogout} />
+        return <Home onSelectRestaurant={handleSelectRestaurant} onOpenSettings={() => setCurrentPage('settings')} onOpenOrders={() => setCurrentPage('orders')} onLogout={handleLogout} />
+      case 'orders':
+        return <OrderConfirmed onBack={() => setCurrentPage('home')} onViewCart={() => setCurrentPage('cart')} cart ={cart} />
       case 'menu':
         return (
           <RestaurantMenu
@@ -151,7 +155,9 @@ function App() {
       case 'settings':
         return <UserSettings onBack={() => setCurrentPage('home')} />
       case 'admin-home':
-        return <AdminHome onLogout={handleLogout} />
+        return <AdminHome  onAnalytics={() => setCurrentPage('admin-analytics')}/>
+      case 'admin-analytics':
+        return <AdminAnalyticsPage onBack={() => setCurrentPage('admin-home')} />
       case 'merchant-home':
         console.log('Rendering: MerchantHome')
         return <MerchantHome user={user} onLogout={handleLogout} /> // Add user prop

@@ -128,7 +128,7 @@ CREATE TABLE orders (
   user_id                  BIGINT       NOT NULL,
   merchant_id              BIGINT       NOT NULL,
   driver_id                BIGINT       NULL,
-  status                   ENUM('PENDING','CONFIRMED','PREPARING','READY_FOR_PICKUP','PICKED_UP','IN_TRANSIT','DELIVERED','COMPLETED','CANCELLED','FAILED') NOT NULL,
+  status                   ENUM('PENDING','CONFIRMED','PREPARING','READY_FOR_PICKUP','PICKING_UP', 'PICKED_UP','IN_TRANSIT','DELIVERED','COMPLETED','CANCELLED','FAILED') NOT NULL,
   order_type               ENUM('DELIVERY','PICKUP') NOT NULL DEFAULT 'DELIVERY',
   total_amount             DECIMAL(10,2) NULL,
   delivery_address         VARCHAR(512)  NOT NULL,

@@ -1,77 +1,80 @@
 import React from 'react'
 import { CheckCircle, Home, Package } from 'lucide-react'
+import orders from '../services/orders'
+import OrderCard from './OrderCard';
+import { useEffect, useState } from 'react';
+import { Plus, Minus, ArrowLeft } from 'lucide-react'
+import { products } from '../services/api'
+const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
 
-const OrderConfirmed = ({ onBackToHome }) => {
+export default function OrderConfirmed({ onBack, onViewCart, cart }) {
+  const [orderList, setOrderList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('')
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0)
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const res = await orders.getMyOrders();
+        console.log("Fetched orders:", res.data.data);
+        setOrderList(res.data.data || []);
+      } catch (err) {
+        console.error("Failed to load orders", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return <div className="text-white text-center p-20">Loading orders...</div>;
+  }
+
   return (
+    
     <div className="min-h-screen bg-black text-white p-4">
-      <div className="max-w-2xl mx-auto text-center">
-        {/* Success Icon */}
-        <div className="mb-8">
-          <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-white" />
+      {/* Floating top bar */}
+      <div className="fixed top-0 inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}>
+          <button
+            onClick={onBack}
+            className="flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-gray-900 transition"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Restaurants
+          </button>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products..."
+              className="w-full max-w-xl px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm"
+            />
           </div>
+          <button
+            onClick={onViewCart}
+            className="px-4 py-2 rounded-lg border border-red-300 bg-red-600 text-white hover:bg-red-700 transition"
+          >
+            🛒 Cart ({cartItemCount})
+          </button>
         </div>
+      </div>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8">Your Orders</h1>
 
-        {/* Success Message */}
-        <h1 className="text-4xl font-bold mb-4">Order Confirmed! 🎉</h1>
-        <p className="text-xl text-gray-400 mb-8">
-          Thank you for your order. Your drinks are being prepared and will be delivered soon.
-        </p>
+        {orderList.length === 0 && (
+          <p className="text-gray-400 text-center">You have no orders yet.</p>
+        )}
 
-        {/* Order Details Card */}
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 mb-8 text-left">
-          <div className="flex items-center justify-center mb-6">
-            <Package className="w-8 h-8 text-red-600 mr-3" />
-            <h2 className="text-2xl font-semibold">Order Details</h2>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Order Number</span>
-              <span className="text-white font-mono">#BB{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Estimated Delivery</span>
-              <span className="text-white">25-35 minutes</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Delivery To</span>
-              <span className="text-white">Your current location</span>
-            </div>
-            <div className="flex justify-between text-lg font-semibold border-t border-gray-700 pt-4">
-              <span className="text-gray-400">Total</span>
-              <span className="text-red-600">${(Math.random() * 50 + 20).toFixed(2)}</span>
-            </div>
-          </div>
+        <div className="space-y-6">
+          {orderList.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))}
         </div>
-
-        {/* Next Steps */}
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-4">What's Next?</h3>
-          <div className="space-y-3 text-gray-400 text-left">
-            <p>✅ Your order has been received</p>
-            <p>🔄 Preparing your drinks</p>
-            <p>🚚 Driver will be assigned shortly</p>
-            <p>📱 You'll receive tracking updates</p>
-          </div>
-        </div>
-
-        {/* Action Button */}
-        <button
-          onClick={onBackToHome}
-          className="w-full max-w-md bg-red-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-red-700 transition duration-200 flex items-center justify-center text-lg mx-auto"
-        >
-          <Home className="w-5 h-5 mr-3" />
-          Back to Home
-        </button>
-
-        {/* Thank You Message */}
-        <p className="text-gray-500 mt-8">
-          Thank you for choosing <span className="text-red-600 font-semibold">BoozeBuddies</span>! 🍻
-        </p>
       </div>
     </div>
-  )
+  );
 }
-
-export default OrderConfirmed

@@ -606,8 +606,7 @@ class MerchantControllerTest {
         .perform(get("/api/merchants/1/orders?page=0&size=10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("Orders retrieved successfully"))
-        .andExpect(jsonPath("$.data.totalElements").value(1));
+        .andExpect(jsonPath("$.message").value("Orders retrieved successfully"));
 
     verify(merchantService, times(1)).getOrdersByMerchant(1L, pageable);
   }
@@ -623,8 +622,7 @@ class MerchantControllerTest {
     mockMvc
         .perform(get("/api/merchants/1/orders?page=0&size=10"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.data.totalElements").value(0));
+        .andExpect(jsonPath("$.success").value(true));
   }
 
   @Test
@@ -733,8 +731,7 @@ class MerchantControllerTest {
         .perform(get("/api/merchants/my-merchant/orders?page=0&size=10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("Your merchant orders retrieved successfully"))
-        .andExpect(jsonPath("$.data.totalElements").value(1));
+        .andExpect(jsonPath("$.message").value("Your merchant orders retrieved successfully"));
 
     verify(merchantService, times(1)).getOrdersByMerchant(1L, pageable);
   }

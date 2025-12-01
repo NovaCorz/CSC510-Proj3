@@ -8,7 +8,7 @@ export const merchants = {
   register: (merchant) => http.post('/merchants/register', merchant),
   verify: (id, verified) => http.put(`/merchants/${id}/verify?verified=${verified}`),
   delete: (id) => http.delete(`/merchants/${id}`),
-  getOrders: (id, page = 0, size = 10) => http.get(`/merchants/${id}/orders?page=${page}&size=${size}`),
+  getOrders: (id) => http.get(`/merchants/${id}/all-orders`),
 }
 
 export default merchants

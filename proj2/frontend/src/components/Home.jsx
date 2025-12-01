@@ -5,12 +5,12 @@ import { THUMBNAIL_SIZE, TOP_BAR_HEIGHT, PAGE_BG, BORDER_LIGHT, BUTTON_SECONDARY
 const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
 import UserSettings from './UserSettings'
 
-const Home = ({ onSelectRestaurant }) => {
+const Home = ({ onSelectRestaurant, onOpenOrders }) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const [restaurants, setRestaurants] = useState([])
   const [settingsOpen, setSettingsOpen] = useState(false)
-
+  console.log('Home props:', { onSelectRestaurant, onOpenOrders });
   useEffect(() => {
     let mounted = true
     // Token is automatically added by axios interceptor in http.js
@@ -53,6 +53,11 @@ const Home = ({ onSelectRestaurant }) => {
           <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
             <button onClick={() => setSettingsOpen(true)} className={`${BUTTON_SECONDARY}`}>
               User Settings
+            </button>
+          </div>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            <button onClick={onOpenOrders} className={BUTTON_SECONDARY}>
+              Orders
             </button>
           </div>
         </div>

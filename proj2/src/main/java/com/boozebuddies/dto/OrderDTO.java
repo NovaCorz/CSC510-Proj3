@@ -1,5 +1,7 @@
 package com.boozebuddies.dto;
-
+import com.boozebuddies.entity.Order;
+import com.boozebuddies.entity.OrderItem;
+import com.boozebuddies.dto.OrderItemDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,4 +45,26 @@ public class OrderDTO {
 
   /** The estimated time of delivery */
   private LocalDateTime estimatedDeliveryTime;
+
+  // Add this method:
+    public static OrderDTO fromEntity(Order order) {
+        return OrderDTO.builder()
+                .id(order.getId())
+                .userId(order.getUser() != null ? order.getUser().getId() : null)
+                .merchantId(order.getMerchant() != null ? order.getMerchant().getId() : null)
+                .driverId(order.getDriver() != null ? order.getDriver().getId() : null)
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus() != null ? order.getStatus().name() : null)
+                .deliveryAddress(order.getDeliveryAddress())
+                .items(order.getItems() != null
+                  ? order.getItems().stream()
+                        .filter(item -> item != null) // ignore nulls
+                        .map(OrderItemDTO::fromEntity)
+                        .toList()
+                  : List.of())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .estimatedDeliveryTime(order.getEstimatedDeliveryTime())
+                .build();
+    }
 }

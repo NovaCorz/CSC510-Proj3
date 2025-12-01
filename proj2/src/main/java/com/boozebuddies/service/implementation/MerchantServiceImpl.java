@@ -161,15 +161,24 @@ public class MerchantServiceImpl implements MerchantService {
       throw new IllegalArgumentException("Invalid merchant ID");
     }
 
-    if (pageable == null) {
-      throw new IllegalArgumentException("Pageable cannot be null");
+    if (!merchantRepository.existsById(merchantId)) {
+      throw new IllegalArgumentException("Merchant not found");
+    }
+    
+    return orderRepository.findByMerchantId(merchantId, pageable);
+  }
+
+  @Override
+  public List<Order> getAllOrdersByMerchant(Long merchantId) {
+    if (merchantId == null || merchantId <= 0) {
+      throw new IllegalArgumentException("Invalid merchant ID");
     }
 
     if (!merchantRepository.existsById(merchantId)) {
       throw new IllegalArgumentException("Merchant not found");
     }
-
-    return orderRepository.findByMerchantId(merchantId, pageable);
+    
+    return orderRepository.findByMerchantId(merchantId);
   }
 
   /**

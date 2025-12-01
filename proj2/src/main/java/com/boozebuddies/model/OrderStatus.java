@@ -12,6 +12,7 @@ package com.boozebuddies.model;
  *   <li>{@link #CONFIRMED} - The order has been verified and accepted for processing.
  *   <li>{@link #PREPARING} - The vendor is currently preparing the items in the order.
  *   <li>{@link #READY_FOR_PICKUP} - The order is ready to be picked up by the delivery driver.
+ *   <li>{@link #PICKING_UP} - The order has a driver on the way to pick it up. 
  *   <li>{@link #PICKED_UP} - The delivery driver has collected the order from the vendor.
  *   <li>{@link #IN_TRANSIT} - The order is currently being delivered to the customer.
  *   <li>{@link #DELIVERED} - The order has arrived at the customer's location.
@@ -36,6 +37,9 @@ public enum OrderStatus {
 
   /** The order is ready to be picked up by the delivery driver. */
   READY_FOR_PICKUP,
+
+  /** The order has a driver on the way to pick it up */
+  PICKING_UP,
 
   /** The delivery driver has collected the order from the vendor. */
   PICKED_UP,
