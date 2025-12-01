@@ -22,7 +22,8 @@ The project demonstrates the power of distributed teamwork, automation, and clea
 
 ---
 ## Demo
-![QR to Demo Video](/proj2/misc/TRN8G2.jpg)
+
+**enter demo here**
 ---
 
 ## 🧩 Tech Stack
