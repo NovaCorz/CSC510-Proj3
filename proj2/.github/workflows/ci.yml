@@ -25,3 +25,6 @@ jobs:
           ./mvnw -B -ntp spotless:check || true
           # ./mvnw -B -ntp checkstyle:check || true
           ./mvnw -B -ntp verify
+
+
+          
