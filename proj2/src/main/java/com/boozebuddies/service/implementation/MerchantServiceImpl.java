@@ -156,7 +156,7 @@ public class MerchantServiceImpl implements MerchantService {
    * @throws IllegalArgumentException if the ID or pageable is invalid, or merchant not found
    */
   @Override
-  public Page<Order> getOrdersByMerchant(Long merchantId) {
+  public Page<Order> getOrdersByMerchant(Long merchantId, Pageable pageable) {
     if (merchantId == null || merchantId <= 0) {
       throw new IllegalArgumentException("Invalid merchant ID");
     }
@@ -164,7 +164,20 @@ public class MerchantServiceImpl implements MerchantService {
     if (!merchantRepository.existsById(merchantId)) {
       throw new IllegalArgumentException("Merchant not found");
     }
+    
+    return orderRepository.findByMerchantId(merchantId, pageable);
+  }
 
+  @Override
+  public List<Order> getAllOrdersByMerchant(Long merchantId) {
+    if (merchantId == null || merchantId <= 0) {
+      throw new IllegalArgumentException("Invalid merchant ID");
+    }
+
+    if (!merchantRepository.existsById(merchantId)) {
+      throw new IllegalArgumentException("Merchant not found");
+    }
+    
     return orderRepository.findByMerchantId(merchantId);
   }
 
