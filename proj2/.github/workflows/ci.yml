@@ -28,11 +28,10 @@ jobs:
 
       - name: Build & Run Tests with Coverage
         run: |
-          cd proj2
           mvn -B clean test
 
       - name: Check for JaCoCo report
-        working-directory: food-seer-backend
+        working-directory: proj2
         run: |
           if [ -f target/site/jacoco/jacoco.xml ]; then
             echo "✅ JaCoCo report found!"
