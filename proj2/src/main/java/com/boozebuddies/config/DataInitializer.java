@@ -43,6 +43,8 @@ public class DataInitializer implements CommandLineRunner {
               .isActive(true)
               .isEmailVerified(true)
               .ageVerified(true)
+              .longitude(-78.0)
+              .latitude(35.0)
               .build();
 
       // Add USER role

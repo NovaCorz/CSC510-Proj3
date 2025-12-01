@@ -101,6 +101,8 @@ public class UserServiceImpl implements UserService {
             .dateOfBirth(request.getDateOfBirth())
             .isActive(true)
             .isEmailVerified(false)
+            .latitude(request.getLatitude())
+            .longitude(request.getLongitude())
             .build();
 
     user.setAgeVerified(validationService.validateAge(user));
@@ -200,6 +202,12 @@ public class UserServiceImpl implements UserService {
               }
               if (updatedUser.getAddress() != null) {
                 user.setAddress(updatedUser.getAddress());
+              }
+              if (updatedUser.getLatitude() != null) {
+            	    user.setLatitude(updatedUser.getLatitude());
+              }
+              if (updatedUser.getLongitude() != null) {
+	        	    user.setLongitude(updatedUser.getLongitude());
               }
               return userRepository.save(user);
             })
