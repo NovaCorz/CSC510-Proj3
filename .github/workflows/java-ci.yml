@@ -35,6 +35,47 @@ jobs:
           ./mvnw -B -ntp spotless:apply
           # ./mvnw -B -ntp checkstyle:check
 
+      - name: Build & Run Tests with Coverage
+        run: |
+          cd proj2
+          mvn -B clean test
+
+      - name: Check for JaCoCo report
+        working-directory: proj2
+        run: |
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            echo "✅ JaCoCo report found!"
+          else
+            echo "❌ JaCoCo report NOT found - check if JaCoCo plugin is active in pom.xml"
+            exit 1
+          fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Upload JUnit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: proj2/target/surefire-reports/
+
+      - name: Publish Test Summary to Actions UI
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit Tests
+          path: proj2/target/surefire-reports/*.xml
+          reporter: java-junit
+
+
   tests:
     name: Optional Tests
     # Run tests ALWAYS on push + PR, OR manually if dispatch says true
@@ -61,3 +102,5 @@ jobs:
       - name: Run Tests
         run: |
           ./mvnw -B -ntp test
+
+      
