@@ -1,3 +1,5 @@
+# 🍻 BoozeBuddies — CSC510-S2G1-F2025 - contributions by S1G13
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17781284.svg)](https://zenodo.org/records/17781284)
 [![GitHub Release](https://img.shields.io/github/release/NovaCorz/CSC510-Proj3.svg)](https://github.com/NovaCorz/CSC510-Proj3/releases)
 [![codecov](https://codecov.io/gh/NovaCorz/CSC510-Proj3/branch/main/graph/badge.svg)](https://codecov.io/gh/NovaCorz/CSC510-Proj3)
@@ -7,8 +9,6 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/NovaCorz/CSC510-Proj3)](https://github.com/NovaCorz/CSC510-Proj3/pulls)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/NovaCorz/CSC510-Proj3/main) 
 ![GitHub code size in bytes](https://img.shields.io/github/repo-size/NovaCorz/CSC510-Proj3)
-
-# 🍻 BoozeBuddies — CSC510-S2G1-F2025
 
 ## 💡 Motivation (Why)
 BoozeBuddies is designed to modernize local alcohol delivery by connecting customers, drivers, and breweries through a unified digital platform.  
