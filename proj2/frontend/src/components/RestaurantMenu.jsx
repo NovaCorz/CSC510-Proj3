@@ -6,7 +6,7 @@ const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2
 
 const initialReviewForm = { rating: '', review: '' }
 
-const RestaurantMenu = ({ restaurant, user, cart, onAddToCart, onRemoveFromCart, onBack, onViewCart }) => {
+const RestaurantMenu = ({ restaurant, user, bannerOffset = 0, cart, onAddToCart, onRemoveFromCart, onBack, onViewCart }) => {
   const [menuItems, setMenuItems] = useState([])
   const [search, setSearch] = useState('')
   const [recommendation, setRecommendation] = useState(null)
@@ -197,7 +197,7 @@ const RestaurantMenu = ({ restaurant, user, cart, onAddToCart, onRemoveFromCart,
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Floating top bar */}
-      <div className="fixed top-0 inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+      <div className="fixed inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', top: bannerOffset }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}>
           <button
             onClick={onBack}
@@ -225,12 +225,13 @@ const RestaurantMenu = ({ restaurant, user, cart, onAddToCart, onRemoveFromCart,
       </div>
 
       {/* Spacer for fixed bar */}
-      <div style={{ height: 112 }} />
+      <div style={{ height: 112 + bannerOffset }} />
 
       {/* Recommendation Sidebar */}
       {recommendation && (
         <div
-          className={`fixed top-24 right-6 z-50 w-80 max-w-full bg-white border border-red-100 shadow-xl rounded-2xl overflow-hidden transition-all duration-300 ease-out ${showRecommendation ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none'}`}
+          className={`fixed right-6 z-50 w-80 max-w-full bg-white border border-red-100 shadow-xl rounded-2xl overflow-hidden transition-all duration-300 ease-out ${showRecommendation ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none'}`}
+          style={{ top: bannerOffset + 96 }}
         >
           <div className="flex items-start justify-between px-4 py-3 bg-red-50 border-b border-red-100">
             <div className="flex items-center gap-2">

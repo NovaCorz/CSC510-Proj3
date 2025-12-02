@@ -26,8 +26,24 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
   // Load merchants on component mount
   useEffect(() => {
     loadMerchants()
-    loadUsers()   // ⭐ added
+    loadUsers()
+    loadBroadcasts()
   }, [])
+
+  const loadBroadcasts = async () => {
+    try {
+      const response = await notifications.list()
+      const data = response.data?.data || response.data || []
+      setBroadcastLog(
+        (Array.isArray(data) ? data : []).map((item) => ({
+          message: item.message,
+          timestamp: item.createdAt,
+        })),
+      )
+    } catch (err) {
+      console.error('Failed to load broadcasts:', err)
+    }
+  }
 
   
   const loadUsers = async () => {
@@ -82,10 +98,7 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
       setBroadcastStatus(null)
       await notifications.broadcast({ message })
       setBroadcastStatus({ type: 'success', text: 'Notification sent to all users.' })
-      setBroadcastLog((prev) => [
-        { message, timestamp: new Date().toISOString() },
-        ...prev,
-      ].slice(0, 5))
+      await loadBroadcasts()
       setBroadcastMessage('')
     } catch (err) {
       console.error('Failed to send broadcast:', err)
@@ -270,21 +283,23 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
               </button>
             </div>
           </form>
-          {broadcastLog.length > 0 && (
+              {broadcastLog.length > 0 && (
             <div className="mt-6">
               <p className="text-sm text-gray-400 mb-2">Recent broadcasts</p>
               <ul className="space-y-2 text-sm text-gray-300">
-                {broadcastLog.map((entry, index) => (
-                  <li
-                    key={`${entry.timestamp}-${index}`}
-                    className="border border-gray-800 rounded-lg px-3 py-2 bg-gray-800"
-                  >
-                    <p className="text-gray-200">{entry.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formatTimestamp(entry.timestamp)}
-                    </p>
-                  </li>
-                ))}
+                    {broadcastLog
+                      .slice(0, 5)
+                      .map((entry, index) => (
+                        <li
+                          key={`${entry.timestamp}-${index}`}
+                          className="border border-gray-800 rounded-lg px-3 py-2 bg-gray-800"
+                        >
+                          <p className="text-gray-200">{entry.message}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatTimestamp(entry.timestamp)}
+                          </p>
+                        </li>
+                      ))}
               </ul>
             </div>
           )}

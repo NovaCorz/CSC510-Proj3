@@ -5,7 +5,7 @@ import { THUMBNAIL_SIZE, TOP_BAR_HEIGHT, PAGE_BG, BORDER_LIGHT, BUTTON_SECONDARY
 const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
 import UserSettings from './UserSettings'
 
-const Home = ({ onSelectRestaurant, onOpenOrders, onLogout }) => {
+const Home = ({ bannerOffset = 0, onSelectRestaurant, onOpenOrders, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const [restaurants, setRestaurants] = useState([])
@@ -34,8 +34,8 @@ const Home = ({ onSelectRestaurant, onOpenOrders, onLogout }) => {
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Floating search bar */}
 <div
-  className="fixed top-0 inset-x-0 z-50 w-full"
-  style={{ background: PAGE_BG, borderBottom: `1px solid ${BORDER_LIGHT}` }}
+  className="fixed inset-x-0 z-50 w-full"
+  style={{ background: PAGE_BG, borderBottom: `1px solid ${BORDER_LIGHT}`, top: bannerOffset }}
 >
   <div
     style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}
@@ -85,7 +85,7 @@ const Home = ({ onSelectRestaurant, onOpenOrders, onLogout }) => {
 
 
       {/* Spacer for fixed bar */}
-      <div style={{ height: TOP_BAR_HEIGHT }} />
+      <div style={{ height: TOP_BAR_HEIGHT + bannerOffset }} />
 
       <div className="px-6 pb-10" style={{ maxWidth: 960, margin: '0 auto' }}>
         {/* Restaurants Grid */}

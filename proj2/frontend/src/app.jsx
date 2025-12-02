@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import Login from './components/Login'
 import DriverLogin from './driver/DriverLogin'
@@ -14,6 +14,8 @@ import OrderConfirmed from './components/OrderConfirmed'
 import AdminAnalyticsPage from './admin/AdminAnalyticsComponent'
 import './App.css'
 import DriverOrderState from './driver/DriverOrderState'
+import BroadcastBanner from './components/BroadcastBanner'
+import { notifications } from './services/api'
 
 const ProtectedRoute = ({ condition, redirectTo = '/login', children }) => {
   if (!condition) {
@@ -28,6 +30,10 @@ const AppShell = () => {
   const [user, setUser] = useState(null)
   const [selectedRestaurant, setSelectedRestaurant] = useState(null)
   const [cart, setCart] = useState([])
+  const [broadcasts, setBroadcasts] = useState([])
+  const [dismissedBroadcastIds, setDismissedBroadcastIds] = useState([])
+  const bannerRef = useRef(null)
+  const [bannerHeight, setBannerHeight] = useState(0)
 
   const hasRole = (role) => user?.roles?.includes(role)
 
@@ -118,8 +124,65 @@ const AppShell = () => {
     navigate('/login')
   }
 
+  useEffect(() => {
+    if (!user) {
+      setBroadcasts([])
+      setDismissedBroadcastIds([])
+      return
+    }
+
+    let cancelled = false
+    const fetchBroadcasts = () => {
+      notifications
+        .list()
+        .then(resp => {
+          if (cancelled) return
+          const payload = resp.data?.data || resp.data || []
+          setBroadcasts(Array.isArray(payload) ? payload : [])
+        })
+        .catch(err => {
+          console.warn('Unable to load broadcasts', err)
+        })
+    }
+
+    fetchBroadcasts()
+    const interval = setInterval(fetchBroadcasts, 30000)
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [user])
+
+  const activeBroadcast = broadcasts.find(
+      (broadcast) => !dismissedBroadcastIds.includes(broadcast.id),
+    )
+
+  useEffect(() => {
+    if (activeBroadcast && bannerRef.current) {
+      setBannerHeight(bannerRef.current.offsetHeight || 0)
+    } else {
+      setBannerHeight(0)
+    }
+  }, [activeBroadcast])
+
+  const dismissBroadcast = (id) => {
+    setDismissedBroadcastIds((prev) =>
+      prev.includes(id) ? prev : [...prev, id],
+    )
+  }
+
   return (
-    <Routes>
+    <>
+      {activeBroadcast && (
+        <BroadcastBanner
+          ref={bannerRef}
+          message={activeBroadcast.message}
+          createdAt={activeBroadcast.createdAt}
+          onDismiss={() => dismissBroadcast(activeBroadcast.id)}
+        />
+      )}
+      <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route
         path="/login"
@@ -139,6 +202,7 @@ const AppShell = () => {
         element={
           <ProtectedRoute condition={!!user && !hasRole('DRIVER')}>
             <Home
+              bannerOffset={bannerHeight}
               onSelectRestaurant={handleSelectRestaurant}
               onOpenSettings={() => navigate('/settings')}
               onOpenOrders={() => navigate('/orders')}
@@ -152,6 +216,7 @@ const AppShell = () => {
         element={
           <ProtectedRoute condition={!!user && !hasRole('DRIVER')}>
             <OrderConfirmed
+              bannerOffset={bannerHeight}
               cart={cart}
               onBack={() => navigate('/home')}
               onViewCart={() => navigate('/cart')}
@@ -167,6 +232,7 @@ const AppShell = () => {
               <RestaurantMenu
                 restaurant={selectedRestaurant}
                 user={user}
+                bannerOffset={bannerHeight}
                 cart={cart}
                 onAddToCart={handleAddToCart}
                 onRemoveFromCart={handleRemoveFromCart}
@@ -266,7 +332,8 @@ const AppShell = () => {
         }
       />
       <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 

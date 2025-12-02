@@ -80,9 +80,11 @@ public class RecommendationServiceImpl implements RecommendationService {
             ? ratingStatsByProduct.getOrDefault(topRatedProduct.getId(), EMPTY_STATS)
             : EMPTY_STATS;
 
-    Product bestSellerFallback =
-        Optional.ofNullable(productRepository.findTopRecommendedProduct(merchantId))
-            .orElse(availableProducts.get(0));
+    Product bestSellerFallback = productRepository.findTopRecommendedProduct(merchantId);
+    if (bestSellerFallback == null) {
+      int randomIndex = java.util.concurrent.ThreadLocalRandom.current().nextInt(availableProducts.size());
+      bestSellerFallback = availableProducts.get(randomIndex);
+    }
 
     Product recommendedProduct =
         topRatedStats.reviewCount() > 0 ? topRatedProduct : bestSellerFallback;
