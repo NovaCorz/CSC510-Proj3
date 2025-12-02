@@ -155,7 +155,7 @@ function App() {
       case 'settings':
         return <UserSettings onBack={() => setCurrentPage('home')} />
       case 'admin-home':
-        return <AdminHome  onAnalytics={() => setCurrentPage('admin-analytics')}/>
+        return <AdminHome  onLogout={handleLogout} onAnalytics={() => setCurrentPage('admin-analytics')}/>
       case 'admin-analytics':
         return <AdminAnalyticsPage onBack={() => setCurrentPage('admin-home')} />
       case 'merchant-home':
