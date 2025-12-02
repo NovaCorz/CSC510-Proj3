@@ -5,6 +5,7 @@ import com.boozebuddies.entity.Merchant;
 import com.boozebuddies.entity.Product;
 import com.boozebuddies.entity.Rating;
 import com.boozebuddies.entity.User;
+import java.util.List;
 
 public interface RatingService {
 
@@ -64,4 +65,36 @@ public interface RatingService {
    * @return The average rating value.
    */
   double getAverageRatingForMerchant(Merchant merchant);
+
+  /**
+   * Retrieves reviews for a merchant in reverse chronological order.
+   *
+   * @param merchantId the merchant identifier
+   * @return list of submitted ratings
+   */
+  List<Rating> getRatingsForMerchant(Long merchantId);
+
+  /**
+   * Retrieves reviews for a product in reverse chronological order.
+   *
+   * @param productId the product identifier
+   * @return list of submitted ratings
+   */
+  List<Rating> getRatingsForProduct(Long productId);
+
+  /**
+   * Counts the total reviews for a merchant.
+   *
+   * @param merchantId the merchant identifier
+   * @return total merchant review count
+   */
+  long getReviewCountForMerchant(Long merchantId);
+
+  /**
+   * Counts the total reviews for a product.
+   *
+   * @param productId the product identifier
+   * @return total product review count
+   */
+  long getReviewCountForProduct(Long productId);
 }

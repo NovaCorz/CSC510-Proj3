@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Trash2, LogOut, Store, RefreshCw } from 'lucide-react'
-import { merchants, users } from '../services/api'
+import { Plus, Trash2, LogOut, Store, RefreshCw, Send, Megaphone } from 'lucide-react'
+import { merchants, users, notifications } from '../services/api'
 
 const AdminHome = ({ onLogout, onAnalytics }) => {
   const [merchantsList, setMerchantsList] = useState([])
@@ -9,6 +9,10 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
   const [error, setError] = useState('')
   
   const [usersList, setUsersList] = useState([])
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [isBroadcasting, setIsBroadcasting] = useState(false)
+  const [broadcastStatus, setBroadcastStatus] = useState(null)
+  const [broadcastLog, setBroadcastLog] = useState([])
   
   const [newMerchant, setNewMerchant] = useState({
     name: '',
@@ -62,6 +66,41 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
       console.error('Error loading merchants:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleBroadcast = async (event) => {
+    event.preventDefault()
+    const message = broadcastMessage.trim()
+    if (!message) {
+      setBroadcastStatus({ type: 'error', text: 'Message cannot be empty.' })
+      return
+    }
+
+    try {
+      setIsBroadcasting(true)
+      setBroadcastStatus(null)
+      await notifications.broadcast({ message })
+      setBroadcastStatus({ type: 'success', text: 'Notification sent to all users.' })
+      setBroadcastLog((prev) => [
+        { message, timestamp: new Date().toISOString() },
+        ...prev,
+      ].slice(0, 5))
+      setBroadcastMessage('')
+    } catch (err) {
+      console.error('Failed to send broadcast:', err)
+      setBroadcastStatus({ type: 'error', text: 'Failed to send notification. Please try again.' })
+    } finally {
+      setIsBroadcasting(false)
+    }
+  }
+
+  const formatTimestamp = (isoString) => {
+    try {
+      const date = new Date(isoString)
+      return date.toLocaleString()
+    } catch {
+      return isoString
     }
   }
 
@@ -186,6 +225,70 @@ const AdminHome = ({ onLogout, onAnalytics }) => {
             {error}
           </div>
         )}
+
+        {/* System Broadcast */}
+        <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Megaphone className="w-6 h-6 text-red-500" />
+              System Broadcast
+            </h2>
+            {broadcastStatus && (
+              <span
+                className={`text-sm font-medium ${
+                  broadcastStatus.type === 'success' ? 'text-green-400' : 'text-red-400'
+                }`}
+              >
+                {broadcastStatus.text}
+              </span>
+            )}
+          </div>
+          <form onSubmit={handleBroadcast} className="space-y-4">
+            <textarea
+              value={broadcastMessage}
+              onChange={(e) => setBroadcastMessage(e.target.value)}
+              placeholder="Write an announcement for all users..."
+              rows={3}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
+              disabled={isBroadcasting}
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-500">
+                This message will be delivered to all active users.
+              </p>
+              <button
+                type="submit"
+                disabled={isBroadcasting}
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed"
+              >
+                {isBroadcasting ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                {isBroadcasting ? 'Sending...' : 'Send Broadcast'}
+              </button>
+            </div>
+          </form>
+          {broadcastLog.length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm text-gray-400 mb-2">Recent broadcasts</p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                {broadcastLog.map((entry, index) => (
+                  <li
+                    key={`${entry.timestamp}-${index}`}
+                    className="border border-gray-800 rounded-lg px-3 py-2 bg-gray-800"
+                  >
+                    <p className="text-gray-200">{entry.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatTimestamp(entry.timestamp)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Create Merchant Form */}

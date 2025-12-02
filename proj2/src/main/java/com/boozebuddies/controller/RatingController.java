@@ -1,5 +1,6 @@
 package com.boozebuddies.controller;
 
+import com.boozebuddies.dto.ApiResponse;
 import com.boozebuddies.dto.RatingDTO;
 import com.boozebuddies.entity.Driver;
 import com.boozebuddies.entity.Merchant;
@@ -11,6 +12,7 @@ import com.boozebuddies.model.Role;
 import com.boozebuddies.security.annotation.RoleAnnotations.*;
 import com.boozebuddies.service.PermissionService;
 import com.boozebuddies.service.RatingService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -198,5 +200,47 @@ public class RatingController {
 
     double average = ratingService.getAverageRatingForMerchant(merchant);
     return ResponseEntity.ok(average);
+  }
+
+  // -----------------------------
+  // Fetch reviews
+  // -----------------------------
+
+  /**
+   * Retrieves all reviews submitted for the specified merchant.
+   *
+   * @param merchantId the merchant ID
+   * @return list of reviews
+   */
+  @GetMapping("/merchant/{merchantId}")
+  public ResponseEntity<ApiResponse<List<RatingDTO>>> getMerchantReviews(
+      @PathVariable Long merchantId) {
+    try {
+      List<RatingDTO> reviews =
+          ratingService.getRatingsForMerchant(merchantId).stream().map(ratingMapper::toDTO).toList();
+      return ResponseEntity.ok(
+          ApiResponse.success(reviews, "Merchant reviews retrieved successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    }
+  }
+
+  /**
+   * Retrieves all reviews submitted for the specified product.
+   *
+   * @param productId the product ID
+   * @return list of reviews
+   */
+  @GetMapping("/product/{productId}")
+  public ResponseEntity<ApiResponse<List<RatingDTO>>> getProductReviews(
+      @PathVariable Long productId) {
+    try {
+      List<RatingDTO> reviews =
+          ratingService.getRatingsForProduct(productId).stream().map(ratingMapper::toDTO).toList();
+      return ResponseEntity.ok(
+          ApiResponse.success(reviews, "Product reviews retrieved successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    }
   }
 }

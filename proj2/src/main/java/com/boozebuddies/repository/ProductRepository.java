@@ -131,6 +131,26 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findTopSellingProducts(@Param("limit") int limit);
 
   /**
+   * Finds the most frequently ordered available product for a merchant.
+   *
+   * @param merchantId the merchant identifier
+   * @return the best-selling product or {@code null} when the merchant has no available products
+   */
+  @Query(
+      value =
+          """
+          SELECT p.* FROM products p
+          LEFT JOIN order_items oi ON p.id = oi.product_id
+          WHERE p.merchant_id = :merchantId
+            AND p.available = true
+          GROUP BY p.id
+          ORDER BY COUNT(oi.id) DESC, p.id ASC
+          LIMIT 1
+          """,
+      nativeQuery = true)
+  Product findTopRecommendedProduct(@Param("merchantId") Long merchantId);
+
+  /**
    * Counts the number of available products offered by a given merchant.
    *
    * @param merchantId the ID of the merchant
