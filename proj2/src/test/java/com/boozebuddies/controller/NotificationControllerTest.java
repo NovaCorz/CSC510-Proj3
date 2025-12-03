@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.boozebuddies.config.TestSecurityConfig;
 import com.boozebuddies.dto.SystemBroadcastDTO;
 import com.boozebuddies.dto.SystemBroadcastRequest;
+import com.boozebuddies.security.JwtAuthenticationFilter;
 import com.boozebuddies.service.NotificationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ class NotificationControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private NotificationService notificationService;
+  @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
 
   @Test
   @WithMockUser
