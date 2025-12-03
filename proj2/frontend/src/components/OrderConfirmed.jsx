@@ -7,7 +7,7 @@ import { Plus, Minus, ArrowLeft } from 'lucide-react'
 import { products } from '../services/api'
 const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
 
-export default function OrderConfirmed({ onBack, onViewCart, cart }) {
+export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, cart }) {
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('')
@@ -36,7 +36,7 @@ export default function OrderConfirmed({ onBack, onViewCart, cart }) {
     
     <div className="min-h-screen bg-black text-white p-4">
       {/* Floating top bar */}
-      <div className="fixed top-0 inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+      <div className="fixed inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', top: bannerOffset }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}>
           <button
             onClick={onBack}
@@ -62,6 +62,7 @@ export default function OrderConfirmed({ onBack, onViewCart, cart }) {
           </button>
         </div>
       </div>
+      <div style={{ height: 112 + bannerOffset }} />
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-8">Your Orders</h1>
 

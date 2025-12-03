@@ -26,6 +26,9 @@ public class RatingMapper {
         .rating(rating.getRating())
         .review(rating.getReview())
         .createdAt(rating.getCreatedAt())
+        .merchantId(rating.getMerchant() != null ? rating.getMerchant().getId() : null)
+        .productId(rating.getProduct() != null ? rating.getProduct().getId() : null)
+        .driverId(rating.getDriver() != null ? rating.getDriver().getId() : null)
         .build();
   }
 

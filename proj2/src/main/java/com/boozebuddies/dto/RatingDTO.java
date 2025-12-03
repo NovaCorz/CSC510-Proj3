@@ -24,6 +24,15 @@ public class RatingDTO {
   /** The ID of the entity being rated */
   private Long targetId;
 
+  /** The merchant associated with the rating, if applicable. */
+  private Long merchantId;
+
+  /** The product associated with the rating, if applicable. */
+  private Long productId;
+
+  /** The driver associated with the rating, if applicable. */
+  private Long driverId;
+
   /** The rating value */
   private Integer rating;
 

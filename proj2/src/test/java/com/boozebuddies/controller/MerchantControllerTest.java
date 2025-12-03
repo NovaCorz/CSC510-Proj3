@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.boozebuddies.config.TestSecurityConfig;
 import com.boozebuddies.dto.MerchantDTO;
+import com.boozebuddies.dto.MerchantRecommendationDTO;
 import com.boozebuddies.entity.Merchant;
 import com.boozebuddies.entity.Order;
 import com.boozebuddies.entity.User;
@@ -15,6 +16,7 @@ import com.boozebuddies.model.Role;
 import com.boozebuddies.security.JwtAuthenticationFilter;
 import com.boozebuddies.service.MerchantService;
 import com.boozebuddies.service.PermissionService;
+import com.boozebuddies.service.RecommendationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalTime;
 import java.util.List;
@@ -55,6 +57,8 @@ class MerchantControllerTest {
   @MockBean private MerchantMapper merchantMapper;
 
   @MockBean private PermissionService permissionService;
+
+@MockBean private RecommendationService recommendationService;
 
   private Merchant testMerchant;
   private MerchantDTO testMerchantDTO;
@@ -785,5 +789,57 @@ class MerchantControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.message").value("An error occurred retrieving orders"));
+  }
+
+  // ==================== RECOMMENDATION TESTS ====================
+
+  @Test
+  @DisplayName("GET /api/merchants/{id}/recommendation should return 200 with recommendation data")
+  void testGetRecommendation_Success() throws Exception {
+    MerchantRecommendationDTO recommendation =
+        MerchantRecommendationDTO.builder()
+            .message("Try the house special")
+            .strategy("BEST_RATED")
+            .averageRating(4.7)
+            .reviewCount(42L)
+            .build();
+
+    when(recommendationService.recommendProductForMerchant(1L)).thenReturn(recommendation);
+
+    mockMvc
+        .perform(get("/api/merchants/1/recommendation"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("Recommendation generated successfully"))
+        .andExpect(jsonPath("$.data.strategy").value("BEST_RATED"))
+        .andExpect(jsonPath("$.data.averageRating").value(4.7));
+  }
+
+  @Test
+  @DisplayName("GET /api/merchants/{id}/recommendation should return 404 when no products available")
+  void testGetRecommendation_NotFound() throws Exception {
+    when(recommendationService.recommendProductForMerchant(1L))
+        .thenThrow(new IllegalStateException("Merchant has no available products to generate a recommendation"));
+
+    mockMvc
+        .perform(get("/api/merchants/1/recommendation"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.success").value(false))
+        .andExpect(
+            jsonPath("$.message")
+                .value("Merchant has no available products to generate a recommendation"));
+  }
+
+  @Test
+  @DisplayName("GET /api/merchants/{id}/recommendation should return 400 on invalid merchant id")
+  void testGetRecommendation_InvalidId() throws Exception {
+    when(recommendationService.recommendProductForMerchant(0L))
+        .thenThrow(new IllegalArgumentException("Merchant id must be provided"));
+
+    mockMvc
+        .perform(get("/api/merchants/0/recommendation"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.success").value(false))
+        .andExpect(jsonPath("$.message").value("Merchant id must be provided"));
   }
 }
