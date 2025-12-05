@@ -53,6 +53,13 @@ public interface NotificationService {
   void broadcastSystemMessage(String message);
 
   /**
+   * Retrieves recent system wide broadcast messages.
+   *
+   * @return list of broadcast payloads ordered newest first
+   */
+  java.util.List<com.boozebuddies.dto.SystemBroadcastDTO> getRecentBroadcasts();
+
+  /**
    * Sends an order confirmation notification to the customer after the order has been placed
    * successfully.
    *

@@ -1,7 +1,8 @@
 package com.boozebuddies.controller;
-
+import com.boozebuddies.dto.OrderDTO;
 import com.boozebuddies.dto.ApiResponse;
 import com.boozebuddies.dto.MerchantDTO;
+import com.boozebuddies.dto.MerchantRecommendationDTO;
 import com.boozebuddies.entity.Merchant;
 import com.boozebuddies.entity.Order;
 import com.boozebuddies.entity.User;
@@ -9,6 +10,7 @@ import com.boozebuddies.mapper.MerchantMapper;
 import com.boozebuddies.security.annotation.RoleAnnotations.*;
 import com.boozebuddies.service.MerchantService;
 import com.boozebuddies.service.PermissionService;
+import com.boozebuddies.service.RecommendationService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.ArrayList;
 /** REST controller for managing merchants and merchant operations. */
 @RestController
 @RequestMapping("/api/merchants")
@@ -29,6 +31,7 @@ public class MerchantController {
   private final MerchantService merchantService;
   private final MerchantMapper merchantMapper;
   private final PermissionService permissionService;
+  private final RecommendationService recommendationService;
 
   /**
    * Constructor injection for merchant services.
@@ -41,10 +44,12 @@ public class MerchantController {
   public MerchantController(
       MerchantService merchantService,
       MerchantMapper merchantMapper,
-      PermissionService permissionService) {
+      PermissionService permissionService,
+      RecommendationService recommendationService) {
     this.merchantService = merchantService;
     this.merchantMapper = merchantMapper;
     this.permissionService = permissionService;
+    this.recommendationService = recommendationService;
   }
 
   // ==================== REGISTER (ADMIN ONLY) ====================
@@ -146,6 +151,32 @@ public class MerchantController {
     } catch (Exception e) {
       return ResponseEntity.badRequest()
           .body(ApiResponse.error("Failed to retrieve merchant: " + e.getMessage()));
+    }
+  }
+
+  /**
+   * Generates a chatbot-friendly recommendation for the specified merchant.
+   *
+   * @param id the merchant identifier
+   * @return recommended product details and messaging
+   */
+  @GetMapping("/{id}/recommendation")
+  @IsAuthenticated
+  public ResponseEntity<ApiResponse<MerchantRecommendationDTO>> getRecommendationForMerchant(
+      @PathVariable Long id) {
+    try {
+      MerchantRecommendationDTO recommendation =
+          recommendationService.recommendProductForMerchant(id);
+      return ResponseEntity.ok(
+          ApiResponse.success(recommendation, "Recommendation generated successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    } catch (IllegalStateException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(ApiResponse.error(e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(ApiResponse.error("Failed to generate recommendation"));
     }
   }
 
@@ -259,7 +290,11 @@ public class MerchantController {
 
       Pageable pageable = PageRequest.of(page, size);
       Page<Order> orders = merchantService.getOrdersByMerchant(id, pageable);
-      return ResponseEntity.ok(ApiResponse.success(orders, "Orders retrieved successfully"));
+      List<OrderDTO> OrderDTOs = new ArrayList<OrderDTO>();
+      for(Order order : orders.getContent()){
+        OrderDTOs.add(OrderDTO.fromEntity(order));
+      }
+      return ResponseEntity.ok(ApiResponse.success(OrderDTOs, "Orders retrieved successfully"));
     } catch (AccessDeniedException e) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(e.getMessage()));
     } catch (IllegalArgumentException e) {
@@ -267,6 +302,42 @@ public class MerchantController {
     } catch (Exception e) {
       return ResponseEntity.badRequest()
           .body(ApiResponse.error("An error occurred retrieving orders"));
+    }
+  }
+
+  /**
+   * Retrieves orders for a specific merchant. Admin or merchant owner only.
+   *
+   * @param id the merchant ID
+   * @param page the page number
+   * @param size the page size
+   * @param authentication the authentication object
+   * @return a paginated list of orders
+   */
+  @GetMapping("/{id}/all-orders")
+  @org.springframework.security.access.prepost.PreAuthorize(
+      "hasRole('ADMIN') or @permissionService.ownsMerchant(authentication, #id)")
+  public ResponseEntity<?> getOrdersByMerchant(
+      @PathVariable Long id,
+      Authentication authentication) {
+    try {
+      if (id == null || id <= 0) {
+        return ResponseEntity.badRequest().body(ApiResponse.error("Invalid merchant ID"));
+      }
+
+      List<Order> orders = merchantService.getAllOrdersByMerchant(id);
+      List<OrderDTO> OrderDTOs = new ArrayList<OrderDTO>();
+      for(Order order : orders){
+        OrderDTOs.add(OrderDTO.fromEntity(order));
+      }
+      return ResponseEntity.ok(ApiResponse.success(OrderDTOs, "Orders retrieved successfully"));
+    } catch (AccessDeniedException e) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(e.getMessage()));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.badRequest()
+          .body(ApiResponse.error(e.getMessage()));
     }
   }
 

@@ -5,12 +5,12 @@ import { THUMBNAIL_SIZE, TOP_BAR_HEIGHT, PAGE_BG, BORDER_LIGHT, BUTTON_SECONDARY
 const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
 import UserSettings from './UserSettings'
 
-const Home = ({ onSelectRestaurant }) => {
+const Home = ({ bannerOffset = 0, onSelectRestaurant, onOpenOrders, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const [restaurants, setRestaurants] = useState([])
   const [settingsOpen, setSettingsOpen] = useState(false)
-
+  console.log('Home props:', { onSelectRestaurant, onOpenOrders });
   useEffect(() => {
     let mounted = true
     // Token is automatically added by axios interceptor in http.js
@@ -33,33 +33,59 @@ const Home = ({ onSelectRestaurant }) => {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Floating search bar */}
-      <div
-        className="fixed top-0 inset-x-0 z-50 w-full"
-        style={{ background: PAGE_BG, borderBottom: `1px solid ${BORDER_LIGHT}` }}
+<div
+  className="fixed inset-x-0 z-50 w-full"
+  style={{ background: PAGE_BG, borderBottom: `1px solid ${BORDER_LIGHT}`, top: bannerOffset }}
+>
+  <div
+    style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}
+  >
+    {/* Search bar */}
+    <div className="relative" style={{ width: '100%', maxWidth: 640 }}>
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+      <input
+        type="text"
+        placeholder="Search restaurants or bars..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm"
+      />
+    </div>
+
+    {/* User Settings */}
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+      <button onClick={() => setSettingsOpen(true)} className={BUTTON_SECONDARY}>
+        User Settings
+      </button>
+    </div>
+
+    {/* Orders */}
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+      <button onClick={onOpenOrders} className={BUTTON_SECONDARY}>
+        Orders
+      </button>
+    </div>
+
+    {/* ⭐ Logout */}
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+      <button
+        onClick={onLogout}
+        className={BUTTON_SECONDARY}
+        style={{
+          backgroundColor: "#dc2626",
+          color: "white",
+          borderColor: "#b91c1c"
+        }}
       >
-        <div
-          style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}
-        >
-          <div className="relative" style={{ width: '100%', maxWidth: 640 }}>
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search restaurants or bars..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm"
-            />
-          </div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <button onClick={() => setSettingsOpen(true)} className={`${BUTTON_SECONDARY}`}>
-              User Settings
-            </button>
-          </div>
-        </div>
-      </div>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
 
       {/* Spacer for fixed bar */}
-      <div style={{ height: TOP_BAR_HEIGHT }} />
+      <div style={{ height: TOP_BAR_HEIGHT + bannerOffset }} />
 
       <div className="px-6 pb-10" style={{ maxWidth: 960, margin: '0 auto' }}>
         {/* Restaurants Grid */}

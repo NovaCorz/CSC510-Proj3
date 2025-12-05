@@ -1,5 +1,5 @@
 package com.boozebuddies.dto;
-
+import com.boozebuddies.entity.OrderItem;
 import java.math.BigDecimal;
 import lombok.*;
 
@@ -29,4 +29,17 @@ public class OrderItemDTO {
 
   /** The subtotal for this order item */
   private BigDecimal subtotal;
+
+  // Mapper method
+    public static OrderItemDTO fromEntity(OrderItem item) {
+        return OrderItemDTO.builder()
+                .id(item.getId())
+                .orderId(item.getOrder() != null ? item.getOrder().getId() : null)
+                .productId(item.getProduct() != null ? item.getProduct().getId() : null)
+                .productName(item.getProduct() != null ? item.getProduct().getName() : null)
+                .quantity(item.getQuantity())
+                .unitPrice(item.getUnitPrice())
+                .subtotal(item.getSubtotal())
+                .build();
+    }
 }

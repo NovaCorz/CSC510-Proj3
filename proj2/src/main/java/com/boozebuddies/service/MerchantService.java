@@ -50,6 +50,14 @@ public interface MerchantService {
   Page<Order> getOrdersByMerchant(Long merchantId, Pageable pageable);
 
   /**
+   * Retrieves all unpaginated orders placed with a specific merchant.
+   *
+   * @param merchantId The ID of the merchant.
+   * @return A list of orders associated with the merchant.
+   */
+  List<Order> getAllOrdersByMerchant(Long merchantId);
+
+  /**
    * Deletes a merchant from the system.
    *
    * @param merchantId The ID of the merchant to remove.

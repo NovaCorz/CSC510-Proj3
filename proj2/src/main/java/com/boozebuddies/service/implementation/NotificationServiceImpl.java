@@ -1,10 +1,16 @@
 package com.boozebuddies.service.implementation;
 
+import com.boozebuddies.dto.SystemBroadcastDTO;
 import com.boozebuddies.entity.Delivery;
 import com.boozebuddies.entity.Driver;
 import com.boozebuddies.entity.Merchant;
 import com.boozebuddies.entity.User;
 import com.boozebuddies.service.NotificationService;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,6 +30,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class NotificationServiceImpl implements NotificationService {
+
+  private final CopyOnWriteArrayList<SystemBroadcastDTO> broadcasts =
+      new CopyOnWriteArrayList<>();
+  private final AtomicLong broadcastIds = new AtomicLong(0L);
 
   /**
    * Sends a general notification message to a user.
@@ -101,7 +111,24 @@ public class NotificationServiceImpl implements NotificationService {
    */
   @Override
   public void broadcastSystemMessage(String message) {
+    SystemBroadcastDTO payload =
+        SystemBroadcastDTO.builder()
+            .id(broadcastIds.incrementAndGet())
+            .message(message)
+            .createdAt(LocalDateTime.now())
+            .build();
+    broadcasts.add(payload);
+    if (broadcasts.size() > 50) {
+      broadcasts.remove(0);
+    }
     System.out.println("[SYSTEM BROADCAST] " + message);
+  }
+
+  @Override
+  public List<SystemBroadcastDTO> getRecentBroadcasts() {
+    return broadcasts.stream()
+        .sorted(Comparator.comparing(SystemBroadcastDTO::getCreatedAt).reversed())
+        .toList();
   }
 
   /**

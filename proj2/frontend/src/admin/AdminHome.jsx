@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Trash2, LogOut, Store, RefreshCw } from 'lucide-react'
-import { merchants } from '../services/api' // Import from your api barrel
+import { Plus, Trash2, LogOut, Store, RefreshCw, Send, Megaphone } from 'lucide-react'
+import { merchants, users, notifications } from '../services/api'
 
-const AdminHome = ({ onLogout }) => {
+const AdminHome = ({ onLogout, onAnalytics }) => {
   const [merchantsList, setMerchantsList] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  
+  const [usersList, setUsersList] = useState([])
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [isBroadcasting, setIsBroadcasting] = useState(false)
+  const [broadcastStatus, setBroadcastStatus] = useState(null)
+  const [broadcastLog, setBroadcastLog] = useState([])
   
   const [newMerchant, setNewMerchant] = useState({
     name: '',
@@ -20,7 +26,48 @@ const AdminHome = ({ onLogout }) => {
   // Load merchants on component mount
   useEffect(() => {
     loadMerchants()
+    loadUsers()
+    loadBroadcasts()
   }, [])
+
+  const loadBroadcasts = async () => {
+    try {
+      const response = await notifications.list()
+      const data = response.data?.data || response.data || []
+      setBroadcastLog(
+        (Array.isArray(data) ? data : []).map((item) => ({
+          message: item.message,
+          timestamp: item.createdAt,
+        })),
+      )
+    } catch (err) {
+      console.error('Failed to load broadcasts:', err)
+    }
+  }
+
+  
+  const loadUsers = async () => {
+    try {
+      const response = await users.getAll()
+      setUsersList(response.data.data || response.data || [])
+    } catch (err) {
+      console.error("Failed to load users:", err)
+    }
+  }
+
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return
+
+    try {
+      await users.delete(id)
+      setUsersList(prev => prev.filter(u => u.id !== id))
+      alert("User deleted successfully!")
+    } catch (err) {
+      console.error("Failed to delete user:", err)
+      alert("Error deleting user.")
+    }
+  }
+
 
   const loadMerchants = async () => {
     try {
@@ -35,6 +82,38 @@ const AdminHome = ({ onLogout }) => {
       console.error('Error loading merchants:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleBroadcast = async (event) => {
+    event.preventDefault()
+    const message = broadcastMessage.trim()
+    if (!message) {
+      setBroadcastStatus({ type: 'error', text: 'Message cannot be empty.' })
+      return
+    }
+
+    try {
+      setIsBroadcasting(true)
+      setBroadcastStatus(null)
+      await notifications.broadcast({ message })
+      setBroadcastStatus({ type: 'success', text: 'Notification sent to all users.' })
+      await loadBroadcasts()
+      setBroadcastMessage('')
+    } catch (err) {
+      console.error('Failed to send broadcast:', err)
+      setBroadcastStatus({ type: 'error', text: 'Failed to send notification. Please try again.' })
+    } finally {
+      setIsBroadcasting(false)
+    }
+  }
+
+  const formatTimestamp = (isoString) => {
+    try {
+      const date = new Date(isoString)
+      return date.toLocaleString()
+    } catch {
+      return isoString
     }
   }
 
@@ -127,6 +206,15 @@ const AdminHome = ({ onLogout }) => {
             <p className="text-gray-400">Manage merchants and system settings</p>
           </div>
           <div className="flex space-x-4">
+            {/* Admin Analytics Button */}
+            {onAnalytics && (
+              <button
+                onClick={onAnalytics}
+                className="bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 flex items-center"
+              >
+                Admin Analytics
+              </button>
+            )}
             <button
               onClick={loadMerchants}
               className="bg-gray-700 text-white px-4 py-3 rounded-lg font-semibold hover:bg-gray-600 transition duration-200 flex items-center"
@@ -150,6 +238,72 @@ const AdminHome = ({ onLogout }) => {
             {error}
           </div>
         )}
+
+        {/* System Broadcast */}
+        <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Megaphone className="w-6 h-6 text-red-500" />
+              System Broadcast
+            </h2>
+            {broadcastStatus && (
+              <span
+                className={`text-sm font-medium ${
+                  broadcastStatus.type === 'success' ? 'text-green-400' : 'text-red-400'
+                }`}
+              >
+                {broadcastStatus.text}
+              </span>
+            )}
+          </div>
+          <form onSubmit={handleBroadcast} className="space-y-4">
+            <textarea
+              value={broadcastMessage}
+              onChange={(e) => setBroadcastMessage(e.target.value)}
+              placeholder="Write an announcement for all users..."
+              rows={3}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
+              disabled={isBroadcasting}
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-500">
+                This message will be delivered to all active users.
+              </p>
+              <button
+                type="submit"
+                disabled={isBroadcasting}
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed"
+              >
+                {isBroadcasting ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                {isBroadcasting ? 'Sending...' : 'Send Broadcast'}
+              </button>
+            </div>
+          </form>
+              {broadcastLog.length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm text-gray-400 mb-2">Recent broadcasts</p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                    {broadcastLog
+                      .slice(0, 5)
+                      .map((entry, index) => (
+                        <li
+                          key={`${entry.timestamp}-${index}`}
+                          className="border border-gray-800 rounded-lg px-3 py-2 bg-gray-800"
+                        >
+                          <p className="text-gray-200">{entry.message}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatTimestamp(entry.timestamp)}
+                          </p>
+                        </li>
+                      ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Create Merchant Form */}
@@ -355,6 +509,38 @@ const AdminHome = ({ onLogout }) => {
             <div className="text-gray-400">Active</div>
           </div>
         </div>
+		
+		{/* ⭐ USERS SECTION — ADDED AT BOTTOM */}
+		<div className="mt-12 bg-gray-900 border border-gray-700 rounded-lg p-6">
+		  <h2 className="text-2xl font-bold mb-6">Users</h2>
+
+		  {usersList.length === 0 ? (
+		    <p className="text-gray-400">No users found.</p>
+		  ) : (
+		    <div className="space-y-3">
+		      {usersList.map(user => (
+		        <div 
+		          key={user.id} 
+		          className="flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700"
+		        >
+		          <div>
+		            <p className="text-white font-medium">{user.name || "Unnamed User"}</p>
+		            <p className="text-gray-400 text-sm">{user.email}</p>
+		            <p className="text-gray-500 text-xs">ID: {user.id}</p>
+		          </div>
+
+		          <button
+		            onClick={() => handleDeleteUser(user.id)}
+		            className="text-red-500 hover:text-red-400 p-2"
+		          >
+		            <Trash2 className="w-5 h-5" />
+		          </button>
+		        </div>
+		      ))}
+		    </div>
+		  )}
+		</div>
+
       </div>
     </div>
   )

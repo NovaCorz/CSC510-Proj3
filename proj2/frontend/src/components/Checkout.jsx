@@ -270,14 +270,11 @@ const Checkout = ({ cart, onBack, onConfirm, user, restaurant }) => {
                       <div className="bg-white/70 rounded-lg p-4 border border-red-100 mb-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-gray-800">Order Status</span>
-                          <span className="text-sm font-semibold text-gray-900 capitalize">{order.status?.toLowerCase() || 'pending'}</span>
+                          <span className="text-sm font-semibold text-gray-900 capitalize">{order.status?.toLowerCase().replace("_", " ") || 'pending'}</span>
                         </div>
                         {delivery && (
                           <>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-800">Delivery Status</span>
-                              <span className="text-sm font-semibold text-gray-900 capitalize">{delivery.status?.toLowerCase() || 'pending'}</span>
-                            </div>
+                            
                             {delivery.driverName && (
                               <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium text-gray-800">Driver</span>
