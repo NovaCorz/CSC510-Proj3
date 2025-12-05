@@ -1,31 +1,47 @@
-import React from 'react'
-import { CheckCircle, Home, Package } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import { CheckCircle, Home, Package, Plus, Minus, ArrowLeft } from 'lucide-react'
 import orders from '../services/orders'
 import OrderCard from './OrderCard';
-import { useEffect, useState } from 'react';
-import { Plus, Minus, ArrowLeft } from 'lucide-react'
 import { products } from '../services/api'
-const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'
+
+const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>';
 
 export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, cart }) {
   const [orderList, setOrderList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('')
-  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0)
-  useEffect(() => {
-    async function fetchOrders() {
-      try {
-        const res = await orders.getMyOrders();
-        console.log("Fetched orders:", res.data.data);
-        setOrderList(res.data.data || []);
-      } catch (err) {
-        console.error("Failed to load orders", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const [search, setSearch] = useState('');
 
-    fetchOrders();
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  // Fetch orders function
+  async function fetchOrders() {
+    try {
+      const res = await orders.getMyOrders();
+      const newOrders = res.data.data || [];
+
+      // Only update if changed (prevents unnecessary renders)
+      setOrderList(prev => {
+        const prevString = JSON.stringify(prev);
+        const newString = JSON.stringify(newOrders);
+        return prevString !== newString ? newOrders : prev;
+      });
+
+    } catch (err) {
+      console.error("Failed to load orders", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load + polling
+  useEffect(() => {
+    fetchOrders(); // initial
+
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 5000); // poll every 5 seconds
+
+    return () => clearInterval(interval); // cleanup
   }, []);
 
   if (loading) {
@@ -33,11 +49,23 @@ export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, c
   }
 
   return (
-    
     <div className="min-h-screen bg-black text-white p-4">
+
       {/* Floating top bar */}
-      <div className="fixed inset-x-0 z-50 w-full" style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', top: bannerOffset }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, maxWidth: 960, margin: '0 auto', padding: '12px 24px' }}>
+      <div
+        className="fixed inset-x-0 z-50 w-full"
+        style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', top: bannerOffset }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            maxWidth: 960,
+            margin: '0 auto',
+            padding: '12px 24px'
+          }}
+        >
           <button
             onClick={onBack}
             className="flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-gray-900 transition"
@@ -45,6 +73,7 @@ export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, c
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Restaurants
           </button>
+
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <input
               type="text"
@@ -54,6 +83,7 @@ export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, c
               className="w-full max-w-xl px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-sm"
             />
           </div>
+
           <button
             onClick={onViewCart}
             className="px-4 py-2 rounded-lg border border-red-300 bg-red-600 text-white hover:bg-red-700 transition"
@@ -62,7 +92,9 @@ export default function OrderConfirmed({ bannerOffset = 0, onBack, onViewCart, c
           </button>
         </div>
       </div>
+
       <div style={{ height: 112 + bannerOffset }} />
+
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-8">Your Orders</h1>
 
