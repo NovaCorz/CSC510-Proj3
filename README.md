@@ -22,7 +22,7 @@ The project demonstrates the power of distributed teamwork, automation, and clea
 
 ---
 ## Demo
-
+[Watch demo here](https://github.com/NovaCorz/CSC510-Proj3/blob/main/proj2/docs/proj3DEMO.mkv)
 ---
 
 ## 🧩 Tech Stack
