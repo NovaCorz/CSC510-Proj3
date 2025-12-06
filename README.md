@@ -20,10 +20,9 @@ Therefore, if you need a beer but don't want to drive, call your booze buddy!!!
 In short: **we make local beer delivery faster, safer, and easier** for everyone involved.  
 The project demonstrates the power of distributed teamwork, automation, and clean software architecture using modern tools like Docker, Spring Boot, and React.
 
----
 ## Demo
-[Watch demo here](https://github.com/NovaCorz/CSC510-Proj3/blob/main/proj2/docs/proj3DEMO.mkv)
----
+Click [here](https://github.com/NovaCorz/CSC510-Proj3/blob/main/proj2/docs/proj3DEMO.mkv) to watch a demo of our application
+
 
 ## 🧩 Tech Stack
 **Front-End:**
