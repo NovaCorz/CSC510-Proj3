@@ -214,6 +214,23 @@ const UserSettings = ({ onBack, asModal = false, onClose }) => {
 
         {renderProfileEditor()}
 
+        {/* Frontend-only Payment */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3">Payment</h2>
+          <div className="grid grid-cols-1 gap-3">
+            <input className="border rounded-lg px-3 py-2" placeholder="Name on card"
+              value={payment.cardName} onChange={e => setPayment({ ...payment, cardName: e.target.value })} />
+            <input className="border rounded-lg px-3 py-2" placeholder="Card number"
+              value={payment.cardNumber} onChange={e => setPayment({ ...payment, cardNumber: e.target.value })} />
+            <input className="border rounded-lg px-3 py-2" placeholder="MM/YY"
+              value={payment.exp} onChange={e => setPayment({ ...payment, exp: e.target.value })} />
+            <input className="border rounded-lg px-3 py-2" placeholder="CVC"
+              value={payment.cvc} onChange={e => setPayment({ ...payment, cvc: e.target.value })} />
+          </div>
+          <p className="text-xs text-gray-500 mt-1">Stored locally only.</p>
+        </section>
+
+
         {/* Frontend-only Address */}
         <section>
           <h2 className="text-lg font-semibold mb-3">Address</h2>
