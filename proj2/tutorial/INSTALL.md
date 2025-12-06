@@ -53,6 +53,7 @@ If using Docker to provide MySQL, wait for the DB to be reachable and use the `d
       -h 127.0.0.1 -P 3306 -u app -papp --silent; do
       echo "waiting for MySQL service..." && sleep 2
     done
+    ./mvnw clean
     SPRING_PROFILES_ACTIVE=docker ./mvnw spring-boot:run
 ```
 
@@ -144,6 +145,9 @@ From the frontend/ directory:
 
 npm install
 
+npm uninstall tailwindcss
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
 
 This installs all required Node modules.
 
