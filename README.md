@@ -10,6 +10,8 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/NovaCorz/CSC510-Proj3)](https://github.com/NovaCorz/CSC510-Proj3/pulls)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/NovaCorz/CSC510-Proj3/main) 
 ![GitHub code size in bytes](https://img.shields.io/github/repo-size/NovaCorz/CSC510-Proj3)
+[![Code style: google java](https://img.shields.io/badge/code_style-google_java-blue)](https://google.github.io/styleguide/javaguide.html)
+[![linting: checkstyle](https://img.shields.io/badge/linting-checkstyle-purple)](https://checkstyle.sourceforge.io/)
 
 ## 💡 Motivation (Why)
 BoozeBuddies is designed to modernize local alcohol delivery by connecting customers, drivers, and breweries through a unified digital platform.  
